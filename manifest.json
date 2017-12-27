@@ -8,7 +8,8 @@
 	
 	"content_scripts": [
 		{
-			"matches": ["http://localhost/money-tools/*"],
+			"matches": ["http://localhost/money-tools/*", 
+						"https://*.itsme247.com/*/MyAccounts/AccountDetails*"],
 			"js": ["lib/jquery-2.1.0.min.js",
                    "main.js"]
 		}
