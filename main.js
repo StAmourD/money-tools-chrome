@@ -14,7 +14,7 @@ $.fn.xpathEvaluate = function(xpathExpression) {
 
 var rowselect = class {
   constructor() {
-    this.i = 1;
+    this.index = 1;
     this.max = $(document).xpathEvaluate('//*[@id="body_rightcolumn"]/div[6]/table/tbody/tr').size();
     this.updateEl();
     this.down();
@@ -23,18 +23,21 @@ var rowselect = class {
     // insert table header "//*[@id="body_rightcolumn"]/div[6]/table/tbody/tr[1]"
     $().add('<th>MS Money</th>').appendTo($(document).xpathEvaluate('//*[@id="body_rightcolumn"]/div[6]/table/tbody/tr[1]'));
     // add buttons to rows
-    $().add('\
-      <td class="GridField" style="background-color: #66A182;">\
-        <div class="a_btn a_btn-one">\
-          <span id="tRow-1" class="tRow">Add</span>\
-        </div>\
-      </td>\
-    ').appendTo($(document).xpathEvaluate('//*[@id="body_rightcolumn"]/div[6]/table/tbody/tr[2]'));
-
+    for (var i = 2; i <= this.max; i++) {
+      $().add('\
+        <td class="GridField" style="background-color: #66A182;">\
+          <div class="a_btn a_btn-one">\
+            <span id="tRow-' + (
+      i - 1).toString() + '" class="tRow">Add</span>\
+          </div>\
+        </td>\
+      ').appendTo($(document).xpathEvaluate('//*[@id="body_rightcolumn"]/div[6]/table/tbody/tr[' + i.toString() + ']'));
+    }
+    this.addClickListeners();
   }
   down() {
-    if (this.i < this.max) {
-      this.i += 1;
+    if (this.index < this.max) {
+      this.index += 1;
       this.current_el.css('border', '');
       this.next_el.css('border', 'medium dashed blue');
       this.updateEl();
@@ -43,8 +46,8 @@ var rowselect = class {
     return;
   }
   up() {
-    if (this.i > 1) {
-      this.i -= 1;
+    if (this.index > 1) {
+      this.index -= 1;
       this.current_el.css('border', '');
       this.prev_el.css('border', 'medium dashed blue');
       this.updateEl();
@@ -54,28 +57,51 @@ var rowselect = class {
   }
   right() {
     var thisEl = this.current_el.get(0);
-    var copyText = document.getElementById("toCopy");
-    var toCopyValue;
-    var theseFields;
-
-    theseFields = thisEl.getElementsByTagName("td");
-    toCopyValue = "FromTable|" + theseFields[0].innerText + "|" + theseFields[1].innerText + "|" + theseFields[2].innerText + "|" + theseFields[3].innerText;
-    copyText.value = toCopyValue;
-    copyText.select();
-    document.execCommand("Copy");
+    copyRowData(thisEl)
 
     return;
   }
   updateEl() {
     this.prev_el = $(document).xpathEvaluate('//*[@id="body_rightcolumn"]/div[6]/table/tbody/tr[' + (
-    this.i - 1) + ']');
-    this.current_el = $(document).xpathEvaluate('//*[@id="body_rightcolumn"]/div[6]/table/tbody/tr[' + this.i.toString() + ']');
+    this.index - 1) + ']');
+    this.current_el = $(document).xpathEvaluate('//*[@id="body_rightcolumn"]/div[6]/table/tbody/tr[' + this.index.toString() + ']');
     this.next_el = $(document).xpathEvaluate('//*[@id="body_rightcolumn"]/div[6]/table/tbody/tr[' + (
-    this.i + 1).toString() + ']');
+    this.index + 1).toString() + ']');
+  }
+  addClickListeners() {
+    var btns = document.getElementsByClassName('a_btn');
+    var i = 0
+    for (i = 0; i <= btns.length - 1; i++) {
+      btns[i].addEventListener("click", this.copyToClipboard, false);
+    }
+  }
+  copyToClipboard(event) {
+    var elID = this.firstElementChild.getAttribute("id");
+    var idArr = elID.split('-')
+    var thisID = idArr[idArr.length - 1]
+
+    var elToCopy = $(document).xpathEvaluate('//*[@id="body_rightcolumn"]/div[6]/table/tbody/tr[' + (
+    thisID) + ']');
+    copyRowData(elToCopy.get(0));
   }
 };
 
+var copyRowData = function(thisEl) {
+  var copyText = document.getElementById("toCopy");
+  var toCopyValue;
+  var theseFields;
+
+  theseFields = thisEl.getElementsByTagName("td");
+  toCopyValue = "FromTable|" + theseFields[0].innerText + "|" + theseFields[1].innerText + "|" + theseFields[2].innerText + "|" + theseFields[3].innerText;
+  copyText.value = toCopyValue;
+  copyText.select();
+  document.execCommand("Copy");
+
+  return;
+}
+
 var injectCss = function() {
+  // adapted from https://codepen.io/rauldronca/pen/mEXomp
   $("<style>").prop("type", "text/css").html("\
     .a_btn {\
       line-height: 20px;\
@@ -142,26 +168,12 @@ var injectCss = function() {
     ").appendTo("head");
 }
 
-var addClickListeners = function() {
-  var btns = document.getElementsByClassName('a_btn');
-  btns['0'].addEventListener("click", copyToClipboard, true);
-}
-
-var copyToClipboard = function() {
-  var elID = this.firstElementChild.getAttribute("id");
-  var idArr = elID.split('-')
-  var thisID = idArr[idArr.length - 1]
-
-  alert(thisID);
-};
-
 // on DOM load
 $(function() {
   "use strict";
 
-  var rowSelect = new rowselect();
   injectCss();
-  addClickListeners();
+  var rowSelect = new rowselect();
 
   window.addEventListener("keydown", function(event) {
     if (event.defaultPrevented) {
