@@ -72,16 +72,16 @@ var rowselect = class {
     var btns = document.getElementsByClassName('a_btn');
     var i = 0
     for (i = 0; i <= btns.length - 1; i++) {
-      btns[i].addEventListener("click", this.copyToClipboard, false);
+      btns[i].addEventListener("click", this.addBtnClick, false);
     }
   }
-  copyToClipboard(event) {
+  addBtnClick(event) {
     var elID = this.firstElementChild.getAttribute("id");
     var idArr = elID.split('-')
     var thisID = idArr[idArr.length - 1]
 
     var elToCopy = $(document).xpathEvaluate('//*[@id="body_rightcolumn"]/div[6]/table/tbody/tr[' + (
-    thisID) + ']');
+    Number(thisID) + 1) + ']');
     copyRowData(elToCopy.get(0));
   }
 };
