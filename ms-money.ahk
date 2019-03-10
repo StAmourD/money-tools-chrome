@@ -1,5 +1,4 @@
-; This autohotkey script adds and removes flags in the
-; antiquated accounting software we use :-/
+; This autohotkey script enters transactions, adds and removes flags in the antiquated accounting software we use :-/
 ;
 ; Start each sequence with the category field selected
 ; while entering a new transaction, or modifiying an
@@ -8,9 +7,9 @@
 ; Money Plus Sunset Deluxe: [https://www.microsoft.com/en-us/download/details.aspx?id=20738]
 ; Chrome Extension: [https://github.com/StAmourD/money-tools-chrome]
 
-; CTRL+Enter: removes flag from an existing entry
+; CTRL+Enter: add flag to a new entry
+; CTRL+ALT+Enter: removes flag from an existing entry
 ; CTRL+DOWN: Navigates to category from account entry list
-; CTRL+ALT+Enter: add flag to a new entry
 ; CTRL+ALT+Space: remove flags from modified entry from category screen
 ; CTRL+ALT+RButton: reload this script
 
@@ -119,8 +118,8 @@ return
 ;;;
 
 ; keystrokes to removes flag from an existing entry
-; CTRL+Enter
-^Enter::
+; CTRL+ALT+Enter
+^!Enter::
 	Send {Tab}
 	Sleep, 200
 	Send {Enter}
@@ -138,6 +137,20 @@ return
 	Send {Enter}
 Return
 
+; keystrokes to add flag to a new entry
+; CTRL+Enter
+^Enter::
+	Send {Tab}
+	Sleep, 200
+	Send, {AppsKey}
+	Sleep, 400
+	Send o
+	Sleep, 200
+	Send {Enter}
+	Sleep, 200
+	Send {Enter}
+Return
+
 ; Navigates to category from account entry list
 ; CTRL+DOWN
 ^Down::
@@ -151,21 +164,6 @@ Return
 	Sleep, 200
 	Send {Tab}
 	Sleep, 200
-Return
-
-
-; keystrokes to add flag to a new entry
-; CTRL+ALT+Enter
-^!Enter::
-	Send {Tab}
-	Sleep, 200
-	Send, {AppsKey}
-	Sleep, 400
-	Send o
-	Sleep, 200
-	Send {Enter}
-	Sleep, 200
-	Send {Enter}
 Return
 
 ; keystrokes to remove flags from modified entry from category screen
